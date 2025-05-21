@@ -6,7 +6,6 @@ import './App.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-
 // Fondo animado tipo "matrix"
 function FondoAnimado() {
   const columns = 80;
@@ -37,6 +36,137 @@ function FondoAnimado() {
     </div>
   );
 }
+
+// --- FORMULARIO INTEGRADO ---
+function FormEstimacion() {
+  const [consumo, setConsumo] = useState("");
+  const [paises, setPaises] = useState([]);
+  const [pais, setPais] = useState("");
+  const [year, setYear] = useState("");
+  const [resultado, setResultado] = useState(null);
+  const [error, setError] = useState("");
+  const [anios, setAnios] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:8000/paises")
+      .then(res => setPaises(res.data.paises))
+      .catch(() => setPaises([]));
+  }, []);
+
+  useEffect(() => {
+    if (pais) {
+      axios.get(`http://localhost:8000/anios?entity=${pais}`)
+        .then(res => setAnios(res.data.anios))
+        .catch(() => setAnios([]));
+    } else {
+      setAnios([]);
+    }
+  }, [pais]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setResultado(null);
+
+    if (!consumo || isNaN(consumo) || Number(consumo) <= 0) {
+      setError("Por favor ingresa un consumo válido en kWh.");
+      return;
+    }
+    if (!pais) {
+      setError("Por favor selecciona un país.");
+      return;
+    }
+    if (!year) {
+      setError("Por favor selecciona un año.");
+      return;
+    }
+
+    try {
+      const res = await axios.get("http://localhost:8000/estimacion-renovable", {
+        params: {
+          consumo_kwh: Number(consumo),
+          entity: pais,
+          year: Number(year)
+        }
+      });
+      setResultado(res.data);
+    } catch (err) {
+      setError("No se pudo calcular la estimación. Intenta más tarde.");
+    }
+  };
+
+  return (
+    <div className="card card-animada mx-auto my-5" style={{ maxWidth: 1200 }}>
+      <div className="card-body">
+        <h2 className="card-title text-white mb-4">Estimación de Energía Renovable</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label text-white">País</label>
+            <select
+              className="form-select select-animado"
+              value={pais}
+              onChange={e => setPais(e.target.value)}
+              required
+            >
+              <option value="">-- Selecciona un país --</option>
+              {paises.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label className="form-label text-white">Año</label>
+            <select
+              className="form-select select-animado"
+              style={{ backgroundColor: "#111",  border: "1px solid #0f0" }}
+              value={year}
+              onChange={e => setYear(e.target.value)}
+              required
+              disabled={!anios.length}
+            >
+              <option value="">-- Selecciona un año --</option>
+              {anios.map(a => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="consumo" className="form-label text-white">
+              Consumo eléctrico total (kWh)
+            </label>
+            <input
+              type="number"
+              className="form-control select-animado"
+              id="consumo"
+              placeholder="Ejemplo: 3500"
+              value={consumo}
+              onChange={e => setConsumo(e.target.value)}
+              min="1"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary select-animado">
+            Calcular
+          </button>
+        </form>
+        {error && <div className="alert alert-danger mt-3">{error}</div>}
+        {resultado && (
+          <div className="alert alert-success mt-3">
+            <strong>Porcentaje de energía renovable estimado:</strong>
+            <br />
+            {resultado.porcentaje_renovable_estimado}%
+            <br />
+            <small>
+              Consumo renovable estimado: {resultado.consumo_renovable_kwh_estimado} kWh<br />
+              País: {resultado.pais} | Año: {resultado.año}
+            </small>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+// --- FIN FORMULARIO INTEGRADO ---
 
 function App() {
   const [mensaje, setMensaje] = useState('');
@@ -75,7 +205,7 @@ function App() {
 
   return (
     <>
-    <FondoAnimado />
+      <FondoAnimado />
       <div className="fondo-personalizado" style={{ position: "relative", zIndex: 1 }}>
         {/* Navbar */}
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -98,6 +228,9 @@ function App() {
                   <a className="nav-link" href="#home">Inicio</a>
                 </li>
                 <li className="nav-item">
+                  <a className="nav-link" href="#home">Formulario</a>
+                </li>
+                <li className="nav-item">
                   <a className="nav-link" href="#about">Acerca</a>
                 </li>
                 <li className="nav-item">
@@ -111,10 +244,12 @@ function App() {
         {/* Main Content */}
         <main className="container-fluid my-5">
           <section id="home" className="mb-5">
-            <h1 className="text-center text-center text-white">Bienvenido a Energías Limpias</h1>
-            <p className="text-center text-center text-white"> Explora la evolución de las energías renovables en el mundo desde 1965  
+            <h1 className="text-center text-white">Bienvenido a Energías Limpias</h1>
+            <p className="text-center text-white">
+              Explora la evolución de las energías renovables en el mundo desde 1965  
               este espacio interactivo te permite visualizar el progreso de distintas fuentes limpias como la solar, eólica e hidroeléctrica, 
-              y comprender su papel clave en un futuro energético más sostenible y justo..</p>
+              y comprender su papel clave en un futuro energético más sostenible y justo..
+            </p>
             {/* <p className="text-center text-success">{mensaje}</p> */}
           </section>
 
@@ -142,12 +277,15 @@ function App() {
             </div>
             <br />
             {gifUrl && (
-                <div className="d-flex flex-column align-items-center">
-                  <h4 className="text-white mb-3">Gráfica de {paisSeleccionado} ({tipoGrafica})</h4>
-                  <img src={gifUrl} alt={`Gráfica de ${paisSeleccionado}`} style={{ maxWidth: '100%' }} />
-                </div>
-              )}
+              <div className="d-flex flex-column align-items-center">
+                <h4 className="text-white mb-3">Gráfica de {paisSeleccionado} ({tipoGrafica})</h4>
+                <img src={gifUrl} alt={`Gráfica de ${paisSeleccionado}`} style={{ maxWidth: '100%' }} />
+              </div>
+            )}
           </section>
+
+          {/* Aquí se integra el formulario */}
+          <FormEstimacion />
 
           <section id="about" className="mb-5 d-flex justify-content-center align-items-center" style={{ minHeight: '40vh' }}>
             <div className="card card-animada text-center" style={{ maxWidth: 1200, width: '100%' }}>
@@ -184,7 +322,8 @@ function App() {
           <p className="mb-0">© 2025 Mi Página. Todos los derechos reservados.</p>
         </footer>
       </div>
-    </>  
+    </>
   );
 }
+
 export default App;
