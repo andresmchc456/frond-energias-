@@ -37,6 +37,127 @@ function FondoAnimado() {
   );
 }
 
+// --- DASHBOARD INTEGRADO ---
+function DashboardRenovable() {
+  const [paises, setPaises] = useState([]);
+  const [pais, setPais] = useState("");
+  const [anios, setAnios] = useState([]);
+  const [year, setYear] = useState("");
+  const [consumo, setConsumo] = useState("");
+  const [resumen, setResumen] = useState(null);
+  const [gifUrl, setGifUrl] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    axios.get("http://localhost:8000/paises")
+      .then(res => setPaises(res.data.paises))
+      .catch(() => setPaises([]));
+  }, []);
+
+  useEffect(() => {
+    if (pais) {
+      axios.get(`http://localhost:8000/anios?entity=${pais}`)
+        .then(res => setAnios(res.data.anios))
+        .catch(() => setAnios([]));
+    } else {
+      setAnios([]);
+    }
+  }, [pais]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setResumen(null);
+    setGifUrl("");
+
+    if (!pais || !year || !consumo || isNaN(consumo) || Number(consumo) <= 0) {
+      setError("Completa todos los campos correctamente.");
+      return;
+    }
+
+    setGifUrl(`http://localhost:8000/grafica/${pais}?tipo=linea`);
+
+    try {
+      const res = await axios.get("http://localhost:8000/estimacion-renovable", {
+        params: {
+          consumo_kwh: Number(consumo),
+          entity: pais,
+          year: Number(year)
+        }
+      });
+      setResumen(res.data);
+    } catch {
+      setError("No se pudo obtener el resumen. Intenta más tarde.");
+    }
+  };
+
+  return (
+    <section className="mb-5">
+      <div className="card card-animada mx-auto" style={{ maxWidth: 1200 }}>
+        <div className="card-body">
+          <h2 className="card-title text-white mb-4">Dashboard de Energía Renovable</h2>
+          <form className="row g-3" onSubmit={handleSubmit}>
+            <div className="col-md-4">
+              <label className="form-label text-white">País</label>
+              <select className="form-select select-animado" value={pais} onChange={e => setPais(e.target.value)} required>
+                <option value="">-- Selecciona un país --</option>
+                {paises.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+            <div className="col-md-4">
+              <label className="form-label text-white">Año</label>
+              <select
+                className="form-select select-animado"
+                style={{ backgroundColor: "#111",border: "1px solid #0f0" }}
+                value={year}
+                onChange={e => setYear(e.target.value)}
+                required
+                disabled={!anios.length}
+              >
+                <option value="">-- Selecciona un año --</option>
+                {anios.map(a => <option key={a} value={a}>{a}</option>)}
+              </select>
+            </div>
+            <div className="col-md-4">
+              <label className="form-label text-white">Consumo eléctrico total (kWh)</label>
+              <input
+                type="number"
+                className="form-control select-animado"
+                value={consumo}
+                onChange={e => setConsumo(e.target.value)}
+                min="1"
+                required
+                placeholder="Ejemplo: 3500"
+              />
+            </div>
+            <div className="col-12 d-flex justify-content-end">
+              <button type="submit" className="btn btn-primary select-animado">Ver resumen</button>
+            </div>
+          </form>
+          {error && <div className="alert alert-danger mt-3">{error}</div>}
+          {gifUrl && (
+            <div className="d-flex flex-column align-items-center mt-4">
+              <h5 className="text-white mb-3">Gráfica de {pais} (línea)</h5>
+              <img src={gifUrl} alt={`Gráfica de ${pais}`} style={{ maxWidth: '100%' }} />
+            </div>
+          )}
+          {resumen && (
+            <div className="alert alert-success mt-4">
+              <h5>Resumen para {resumen.pais} - {resumen.año}</h5>
+              <ul className="mb-0">
+                <li><b>Consumo total:</b> {resumen.consumo_total_kwh} kWh</li>
+                <li><b>Porcentaje renovable estimado:</b> {resumen.porcentaje_renovable_estimado}%</li>
+                <li><b>Consumo renovable estimado:</b> {resumen.consumo_renovable_kwh_estimado} kWh</li>
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+// --- FIN DASHBOARD INTEGRADO ---
+
 // --- FORMULARIO INTEGRADO ---
 function FormEstimacion() {
   const [consumo, setConsumo] = useState("");
@@ -284,7 +405,10 @@ function App() {
             )}
           </section>
 
-          {/* Aquí se integra el formulario */}
+          {/* Dashboard integrado */}
+          <DashboardRenovable />
+
+          {/* Formulario integrado */}
           <FormEstimacion />
 
           <section id="about" className="mb-5 d-flex justify-content-center align-items-center" style={{ minHeight: '40vh' }}>
