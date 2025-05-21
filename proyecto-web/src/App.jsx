@@ -1,5 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css styles/styleBackgrounds.css';
+import './css styles/selectBox.css';
+import './css styles/card.css';
 import './App.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -78,7 +80,7 @@ function App() {
         {/* Navbar */}
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
-            <a className="navbar-brand" href="#">ROLOLANDIA</a>
+            <a className="navbar-brand" href="#">Energias limpias</a>
             <button
               className="navbar-toggler"
               type="button"
@@ -109,8 +111,10 @@ function App() {
         {/* Main Content */}
         <main className="container-fluid my-5">
           <section id="home" className="mb-5">
-            <h1 className="text-center text-center text-white">Bienvenido a Mi Página</h1>
-            <p className="text-center text-center text-white">Esta es una página de ejemplo con React y Bootstrap.</p>
+            <h1 className="text-center text-center text-white">Bienvenido a Energías Limpias</h1>
+            <p className="text-center text-center text-white"> Explora la evolución de las energías renovables en el mundo desde 1965  
+              este espacio interactivo te permite visualizar el progreso de distintas fuentes limpias como la solar, eólica e hidroeléctrica, 
+              y comprender su papel clave en un futuro energético más sostenible y justo..</p>
             {/* <p className="text-center text-success">{mensaje}</p> */}
           </section>
 
@@ -118,7 +122,7 @@ function App() {
             <div className="row align-items-center">
               <div className="col-md-6">
                 <h2 className="text-white">Gráfica por país</h2>
-                <select className="form-select" value={paisSeleccionado} onChange={handlePaisChange}>
+                <select className="form-select select-animado" style={{ cursor: 'pointer' }} value={paisSeleccionado} onChange={handlePaisChange}>
                   <option value="">-- Selecciona un país --</option>
                   {paises.map(pais => (
                     <option key={pais} value={pais}>{pais}</option>
@@ -128,24 +132,34 @@ function App() {
 
               <div className="col-md-6">
                 <h2 className="text-white">Gráfica tipo de gráfica</h2>
-                <select className="form-select" value={tipoGrafica} onChange={handleTipoGraficaChange}>
+                <select className="form-select  select-animado" style={{ cursor: 'pointer' }} value={tipoGrafica} onChange={handleTipoGraficaChange}>
                   <option value="linea">Línea</option>
                   <option value="barras">Barras</option>
                   <option value="torta">Torta</option>
                 </select>
               </div>
             </div>
+            <br />
             {gifUrl && (
-              <div>
-                <h4>Gráfica de {paisSeleccionado} ({tipoGrafica})</h4>
-                <img src={gifUrl} alt={`Gráfica de ${paisSeleccionado}`} style={{maxWidth: '100%'}} />
-              </div>
-            )}
+                <div className="d-flex flex-column align-items-center">
+                  <h4 className="text-white mb-3">Gráfica de {paisSeleccionado} ({tipoGrafica})</h4>
+                  <img src={gifUrl} alt={`Gráfica de ${paisSeleccionado}`} style={{ maxWidth: '100%' }} />
+                </div>
+              )}
           </section>
 
-          <section id="about" className="mb-5">
-            <h2 className="text-white">Acerca de Nosotros</h2>
-            <p className="text-white">Somos un equipo dedicado a crear soluciones web modernas y eficientes.</p>
+          <section id="about" className="mb-5 d-flex justify-content-center align-items-center" style={{ minHeight: '40vh' }}>
+            <div className="card card-animada text-center" style={{ maxWidth: 1200, width: '100%' }}>
+              <div className="card-body">
+                <h2 className="card-title text-white">Acerca de Nosotros</h2>
+                <p className="card-text text-white" style={{ textAlign: 'justify' }}>
+                  Somos un equipo apasionado por la tecnología, la sostenibilidad y el cambio positivo.
+                  Nuestro objetivo es impulsar la conciencia ambiental a través de soluciones web modernas, accesibles y visualmente impactantes.
+                  Creemos en el poder de los datos para transformar realidades, por eso desarrollamos herramientas que informan, educan y motivan a las personas a tomar decisiones más responsables con el planeta.
+                  Con este proyecto, queremos contribuir a un futuro más limpio y justo, donde la transición energética no sea solo una meta, sino una acción colectiva.
+                </p>
+              </div>
+            </div>
           </section>
 
           <section id="contact">
@@ -153,13 +167,13 @@ function App() {
             <form>
               <div className="mb-3">
                 <label htmlFor="name" className="form-label text-white">Nombre</label>
-                <input type="text" className="form-control" id="name" placeholder="Tu nombre" />
+                <input type="text" className="form-control select-animado" style={{ cursor: 'pointer' }} id="name" placeholder="Tu nombre" />
               </div>
               <div className="mb-3">
                 <label htmlFor="email" className="form-label text-white">Correo Electrónico</label>
-                <input type="email" className="form-control" id="email" placeholder="Tu correo" />
+                <input type="email" className="form-control  select-animado" style={{ cursor: 'pointer' }} id="email" placeholder="Tu correo" />
               </div>
-              <button type="submit" className="btn btn-primary bg-dark">Enviar</button>
+              <button type="submit" className="btn btn-primary select-animado">Enviar</button>
             </form>
           </section>
         </main>

@@ -1,0 +1,15 @@
+/* Card animada estilo matrix */
+.card-animada {
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #00c853;
+  border-radius: 16px;
+  box-shadow: 0 0 20px 2px #00c85355;
+  animation: borderPulse 2s infinite;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card-animada:hover {
+  transform: scale(1.03) translateY(-4px);
+  box-shadow: 0 0 32px 8px #00c853cc;
+  border-color: #b9f6ca;
+}
