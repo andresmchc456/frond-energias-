@@ -1,0 +1,46 @@
+@keyframes colorPulse {
+  0% {
+    color: #b9f6ca; /* verde claro */
+  }
+  40% {
+    color: #00c853; /* verde */
+  }
+  50% {
+    color: #009624; /* verde oscuro */
+  }
+  100% {
+    color: #004d40; /* verde más oscuro */
+  }
+}
+
+.fondo-animado {
+  background: #000;
+  min-height: 100vh;
+  min-width: 100vw;
+  font-size: 2em;
+  font-family: monospace;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  text-align: center;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.column span {
+  display: block;
+  animation: colorPulse 3s infinite;
+  padding: 0 0.125em;
+}
