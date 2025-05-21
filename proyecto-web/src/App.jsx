@@ -136,6 +136,7 @@ function App() {
                   <option value="linea">Línea</option>
                   <option value="barras">Barras</option>
                   <option value="torta">Torta</option>
+                  <option value="area">Area</option>
                 </select>
               </div>
             </div>
